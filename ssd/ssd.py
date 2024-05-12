@@ -44,7 +44,7 @@ def process_image(image):
     return image
 
 
-input_path = "photo_2024-05-10_14-17-42.jpg"
+input_path = "/home/chudishe/PycharmProjects/pythonProject/photo_2024-04-26_18-33-50.jpg"
 if input_path.endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif')):
     # if img
     img = cv2.imread(input_path)
