@@ -1,10 +1,13 @@
-import numpy as np
 import cv2
+import numpy as np
+from moviepy.editor import VideoFileClip
+import os
+import uuid
 
 # Classes
 classNames = {0: 'background',
-              8: 'cat',
-              12: 'dog'}
+              8: 'cat'
+              }
 
 # ssd
 prototype = "SSD_using_OpenCV/MobileNetSSD_deploy.prototxt"
@@ -26,6 +29,8 @@ def process_image(image):
 
     font = cv2.FONT_HERSHEY_SIMPLEX
 
+    processed_image = image.copy()  # Create a copy of the image to modify
+
     for i in range(final.shape[0]):
         conf = final[i, 2]
         class_id = int(final[i, 1])
@@ -38,30 +43,26 @@ def process_image(image):
             y2 *= height
             top_left = (int(x1), int(y1))
             bottom_right = (int(x2), int(y2))
-            image = cv2.rectangle(image, top_left, bottom_right, (0, 255, 0), 3)
-            image = cv2.putText(image, class_name, (int(x1), int(y1) - 10), font,
-                                1, (255, 0, 0), 2, cv2.LINE_AA)
-    return image
+            processed_image = cv2.rectangle(processed_image, top_left, bottom_right, (0, 255, 0), 3)
+            processed_image = cv2.putText(processed_image, class_name, (int(x1), int(y1) - 10), font,
+                                          1, (255, 0, 0), 2, cv2.LINE_AA)
+    return processed_image
 
 
-input_path = "/home/chudishe/PycharmProjects/pythonProject/photo_2024-04-26_18-33-50.jpg"
+input_path = "/home/chudishe/PycharmProjects/pythonProject/src/videoplayback.mp4"
+
 if input_path.endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif')):
     # if img
     img = cv2.imread(input_path)
     processed_img = process_image(img)
     cv2.imshow("Image", processed_img)
+    output_filename = f"processed_image_{uuid.uuid4()}.jpg"  # Generating random name for the output image file
+    cv2.imwrite(output_filename, processed_img)  # Saving the processed image
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 else:
     # if mp4
-    cap = cv2.VideoCapture(input_path)
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        processed_frame = process_image(frame)
-        cv2.imshow("Video", processed_frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+    clip = VideoFileClip(input_path)
+    out_path = f'processed_video_{uuid.uuid4()}.mp4'  # Generate a random name for the output video file
+    processed_clip = clip.fl_image(process_image)  # Apply the process_image function to each frame
+    processed_clip.write_videofile(out_path, audio=True)  # Write the processed clip with audio
