@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <title>Registration Form</title>
+</head>
+<body>
+<div class="container">
+    <h1>Registration Form</h1>
+    <form action="/register" method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br>
+        <label for="confirmation">Confirm Password:</label><br>
+        <input type="password" id="confirmation" name="confirmation"><br>
+        <input type="submit" value="Register"><br>
+        <br><label for="login">Already has an account?</label>
+        <a href="/login" id="login">Log In</a>
+    </form>
+    <br>
+    <button onclick="location.href='/'" class="back-button"><img
+            src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/icons/arrow-left.svg" alt="Back"> Back
+    </button>
+</div>
+</body>
+</html>

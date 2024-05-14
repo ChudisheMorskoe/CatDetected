@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Detected</title>
+    <link href="/static/css/detect.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="">Cat Detected</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a id="careLink" class="nav-link" href="/index">Home</a>
+            </li>
+            <li class="nav-item">
+                <a id="aboutLink" class="nav-link" href="/detected">Detect Cat</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+            {% if session["user_id"] %}
+            <li class="nav-item">
+                <a class="btn btn-success" href="/logout">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="btn btn-primary me-2" href="/register">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-success" href="/login">Log In</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<h1> Watch out! Only these formats are accepted: jpg, jpeg, png, bmp, gif, mp4</h1>
+<div class="container">
+    <h1>Upload Image and Video</h1>
+    <form action="#" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="image-upload" class="custom-file-upload">Choose Image</label>
+            <input type="file" id="image-upload" name="image">
+        </div>
+        <div class="form-group">
+            <label for="video-upload" class="custom-file-upload">Choose Video</label>
+            <input type="file" id="video-upload" name="video">
+        </div>
+        <button type="submit" class="btn-submit">Upload</button>
+    </form>
+</div>
+<h3 style="text-align: center">After you upload your file the system needs a little time to detect all the kitties!<p>
+    Once it finds all of them, the file will be automatically downloaded! </p> </h3>
+</body>
+</html>

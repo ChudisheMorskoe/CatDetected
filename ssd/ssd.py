@@ -49,7 +49,7 @@ def process_image(image):
     return processed_image
 
 
-input_path = "/home/chudishe/PycharmProjects/pythonProject/src/videoplayback.mp4"
+input_path = "/static/src/videoplayback.mp4"
 
 if input_path.endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif')):
     # if img
