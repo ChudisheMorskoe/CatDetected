@@ -1,14 +1,79 @@
+import os
+import uuid
+
+import cv2
 import sqlite3
 from functools import wraps
-
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for, send_from_directory
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+from ssd import process_image
+
+UPLOAD_FOLDER = 'static/img/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'bmp'}
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1000 * 1000
 app.secret_key = 'BazYa'
 
+@app.route('/download_processed/<filename>')
+def download_processed_file(filename):
+    try:
+        return send_from_directory('.', filename, as_attachment=True)
+    finally:
+        # after download file - delete
+        file_path = os.path.join('.', filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+# check file extension
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif')):
+                img = cv2.imread(file_path)
+                processed_img = process_image(img)
+                if processed_img is not None:
+                    output_filename = f"processed_image_{uuid.uuid4()}.jpg"
+                    cv2.imwrite(os.path.join(os.getcwd(), output_filename), processed_img)
+                    return redirect(url_for('download_processed_file', filename=output_filename))
+                else:
+                    flash('Unsupported file format')
+                    return redirect(request.url)
+            elif filename.lower().endswith('.mp4'):
+                clip = VideoFileClip(file_path)
+                out_path = f'processed_video_{uuid.uuid4()}.mp4'
+                processed_clip = clip.fl_image(process_image)
+                processed_clip.write_videofile(os.path.join(os.getcwd(), out_path), audio=True)
+                return redirect(url_for('download_processed_file', filename=out_path))
+            else:
+                flash('Unsupported file format')
+                return redirect(request.url)
+    return render_template('upload.html')
+
+@app.route('/download_processed/<filename>')
+def download_file(filename):
+    return send_from_directory('.', filename, as_attachment=True)
 
 def create_connection():
     conn = sqlite3.connect('user.db')
@@ -84,13 +149,13 @@ def register():
         confirmation = request.form.get("confirmation")
 
         if not username:
-            return "Необходимо указать имя пользователя", 400
+            return "It is necessary to specify the user name", 400
         elif not password:
-            return "Необходимо указать пароль", 400
+            return "You need to specify a password", 400
         elif not confirmation:
-            return "Необходимо подтвердить пароль", 400
+            return "You need to confirm the password", 400
         elif password != confirmation:
-            return "Пароли не совпадают", 400
+            return "passwords doesnt match", 400
 
         conn, cursor = create_connection()
         cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
@@ -98,7 +163,7 @@ def register():
 
         if existing_user:
             close_connection(conn)
-            return "Имя пользователя уже существует", 400
+            return "This username already ude ", 400
 
         password_hash = generate_password_hash(password)
         cursor.execute("INSERT INTO users (username, password_hash) VALUES (?, ?)", (username, password_hash))
@@ -112,12 +177,6 @@ def register():
         return redirect("/")
     else:
         return render_template("register.html")
-
-
-@app.route('/detected')
-@login_required
-def detected():
-    return render_template('detected.html')
 
 
 if __name__ == "__main__":
