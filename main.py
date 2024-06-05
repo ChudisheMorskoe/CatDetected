@@ -34,10 +34,10 @@ def login_required(f):
 @app.route('/download_processed/<filename>')
 def download_processed_file(filename):
     try:
-        return send_from_directory('..', filename, as_attachment=True)
+        return send_from_directory('', filename, as_attachment=True)
     finally:
         # after download file - delete
-        file_path = os.path.join('..', filename)
+        file_path = os.path.join('', filename)
         if os.path.exists(file_path):
             os.remove(file_path)
 
@@ -87,7 +87,7 @@ def upload_file():
 
 @app.route('/download_processed/<filename>')
 def download_file(filename):
-    return send_from_directory('..', filename, as_attachment=True)
+    return send_from_directory('', filename, as_attachment=True)
 
 
 def create_connection():
