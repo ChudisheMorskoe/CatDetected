@@ -20,6 +20,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1000 * 1000
 app.secret_key = 'BazYa'
 
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,7 +29,6 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
-
 
 
 @app.route('/download_processed/<filename>')
@@ -98,6 +98,7 @@ def create_connection():
 
 def close_connection(conn):
     conn.close()
+
 
 @app.route('/')
 def index():
