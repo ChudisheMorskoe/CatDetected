@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Detected</title>
+    <link href="/static/css/detect.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="">Cat Detected</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a id="careLink" class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a id="aboutLink" class="nav-link" href="/upload">Detect Cat</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+            {% if session["user_id"] %}
+            <li class="nav-item">
+                <a class="btn btn-success" href="/logout">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="btn btn-primary me-2" href="/register">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-success" href="/login">Log In</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <h1>Load file</h1>
+    <br>
+    <br>
+
+    <h4 style="text-align: center">Carefully! Supports jpg, jpeg, png, bmp, mp4 formats</h4>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file-upload" class="custom-file-upload"> Choose file</label>
+        <input id="file-upload" type="file" name="file" accept=".jpg, .jpeg, .png, .bmp, .gif, .mp4"
+               onchange="this.parentNode.querySelector('.submit-btn').click();">
+        <input type="submit" class="submit-btn" value="Load">
+    </form>
+    <br>
+    <br>
+    <h4 style="text-align: center">Sometimes if the file is large it takes a little longer to download, wait and the
+        download will start as soon as your file is ready!</h4>
+</div>
+</body>
+</html>

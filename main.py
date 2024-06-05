@@ -20,6 +20,17 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1000 * 1000
 app.secret_key = 'BazYa'
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+
 @app.route('/download_processed/<filename>')
 def download_processed_file(filename):
     try:
@@ -30,6 +41,7 @@ def download_processed_file(filename):
         if os.path.exists(file_path):
             os.remove(file_path)
 
+
 # check file extension
 def allowed_file(filename):
     return '.' in filename and \
@@ -37,6 +49,7 @@ def allowed_file(filename):
 
 
 @app.route('/upload', methods=['GET', 'POST'])
+@login_required
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -71,9 +84,11 @@ def upload_file():
                 return redirect(request.url)
     return render_template('upload.html')
 
+
 @app.route('/download_processed/<filename>')
 def download_file(filename):
     return send_from_directory('.', filename, as_attachment=True)
+
 
 def create_connection():
     conn = sqlite3.connect('user.db')
@@ -83,17 +98,6 @@ def create_connection():
 
 def close_connection(conn):
     conn.close()
-
-
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-
-    return decorated_function
-
 
 @app.route('/')
 def index():
